@@ -24,7 +24,7 @@ class PhotoController extends Controller
         $user = User::with(['photos' => function($q){
             $q->orderBy('created_at','desc');
         }])->get()->findOrFail($user->id);
-        $user->photos = $user->photos->groupBy(fn($photo) => $photo->created_at->format('Y-m-j'));
+        $user->photos = $user->photos->groupBy(fn($photo) => $photo->created_at->format('d F Y'));
         return view('photos.index',compact('user'));
     }
 
