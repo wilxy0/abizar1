@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Photo;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
@@ -20,8 +21,11 @@ class PhotoController extends Controller
 
     public function index(Request $request){
         $user = $request->user();
-        $photos = $user->photos()->get();
-        return view('photos.index',compact('photos'));
+        $user = User::with(['photos' => function($q){
+            $q->orderBy('created_at','desc');
+        }])->get()->findOrFail($user->id);
+        $user->photos = $user->photos->groupBy(fn($photo) => $photo->created_at->format('Y-m-j'));
+        return view('photos.index',compact('user'));
     }
 
     public function show(){
